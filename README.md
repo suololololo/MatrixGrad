@@ -55,7 +55,7 @@ $y = a^TXb$,y为标量，a为m维度向量，X为$m \times n$矩阵，b为n维�
 $\partial y \over \partial X$ 按照分母布局，即求解结果为 $m \times n$矩阵。
 
 根据定义可得
- $ \frac{\partial y}{\partial X} |_{ij} = \frac {\partial y} {\partial X_{ij}} = \frac {\partial a^TXb} {\partial X_{ij}} = \frac {\partial a_iX_{ij}b_j} {\partial X_{ij}} = a_ib_j $ 
+ $$\frac{\partial y}{\partial X} |_{ij} = \frac {\partial y} {\partial X_{ij}} = \frac {\partial a^TXb} {\partial X_{ij}} = \frac {\partial a_iX_{ij}b_j} {\partial X_{ij}} = a_ib_j $$ 
 因此，矩阵每个位置元素可根据上述式子求出
 $$
 \frac {\partial y} {\partial X} = \big(a_ib_1, a_1b_2, ... \big) = a^Tb
@@ -109,5 +109,74 @@ df=tr(\frac{\partial f}{\partial X}^T dX) \tag 3
 $$
 
 $$
-df=\frac{\partial f}{\partial x}^T d\mathbf x
+df=\frac{\partial f}{\partial x}^T d\mathbf x \tag 4
+$$
+
+根据式子3，4我们就可以求出标量对矩阵的导数和标量对向量的导数。我们只需要求出 $df$,再给他套上迹 $tr$，就能得到 $\frac{\partial f}{\partial X}$ 或者 $\frac{\partial f}{\partial x}$, 这就是微分法求导。
+
+下面我们看几个例子
+
+1. $f=a^TXb$, 求 $\frac{\partial f}{\partial X}$, 其中 $\mathbf a$为 $m \times 1$的列向量, $X$是 $m \times n$的矩阵, $\mathbf b$是 $n \times 1$的行向量。
+
+$$
+df = d(\mathbf a^TX\mathbf b) = d\mathbf a^T(X\mathbf b) +\mathbf a^T d(X\mathbf b) =  d\mathbf a^T(X\mathbf b) + \mathbf a^TdX\mathbf b +  \mathbf a^TXd\mathbf b
+$$
+因为 $\mathbf a$ 和 $\mathbf b$ 是常量, 所以
+$$
+d\mathbf a^T = d\mathbf b = 0
+$$
+
+因此
+
+$$
+df = \mathbf a^TdX\mathbf b
+$$
+因为f是标量
+$$
+tr(df) = df
+$$
+易得
+$$
+df = tr(\mathbf a^TdX\mathbf b) = tr(\mathbf b\mathbf a^TdX) = tr((\mathbf a \mathbf b^T)^T dX)
+$$
+又因为
+$$
+df = tr(\frac {\partial f}{\partial X}^T dX)
+$$
+所以
+$$
+tr((\mathbf a \mathbf b^T)^T dX) = tr(\frac {\partial f}{\partial X}^T dX)
+$$
+得出
+$$
+\frac {\partial f}{\partial X} = \mathbf a \mathbf b^T
+$$
+
+## 3.矩阵求导的链式法则
+基于微分法则，我们可以求导出任何复杂函数的导数，但是矩阵求导的链式法则可以帮助我们快速求出结果。
+以复合函数求导为例子
+### 复合函数求导
+$f = tr(Y^TMY), Y = \sigma(WX)$,求 $\frac {\partial f}{\partial X}$。 其中 $W是 l\times m$矩阵, $X是 m \times n$矩阵, $M是 l \times l$对称矩阵, 
+
+$$
+df = dtr(Y^TMY)=tr(d(Y^TMY))=tr(d(Y^T)MY) + tr(Y^TMdY) \\= tr((dY)^TMY) + tr(Y^TMdY) \\
+= tr(MY(dY)^T) + tr(Y^TMdY) \\
+= tr((MY)^TdY) + tr(Y^TMdY) \\
+= tr(Y^TM^TdY) + tr(Y^TMdY) \\
+= tr(Y^T(M^T + M) dY) \\
+= tr(Y^T(2M) dY) \\
+$$
+
+所以
+$$
+\frac {\partial f} {\partial Y} = 2MY
+$$
+
+$$
+df = tr(\frac {\partial f}{\partial Y}^T dY) = tr(\frac {\partial f}{\partial Y}^T d \sigma(WX)) \\
+= tr(\frac {\partial f}{\partial Y}^T \dot{\sigma}(WX) \cdot \otimes WdX)) = tr((\frac {\partial f}{\partial Y} \otimes \dot{\sigma}(WX))^TWdX)
+$$
+因此
+$$
+\frac {\partial f} {\partial X} = W^T\frac {\partial f}{\partial Y} \otimes \dot{\sigma}(WX) = W^T(2MY\otimes \dot{\sigma}(WX))
 $$
